@@ -18,6 +18,15 @@ python3 scripts/validate.py
 python3 scripts/sync.py
 ```
 
+Create a new skill skeleton with its required frontmatter and Markdown heading:
+
+```sh
+python3 scripts/new_skill.py code-review "Review code for correctness, security, and maintainability"
+```
+
+This creates `skills/code-review/SKILL.md` and refuses to overwrite an existing
+skill directory.
+
 When this repository is checked out beside the private profile repository at
 `../ai-profile`, the sync tool automatically uses that profile's configuration
 and synchronizes both layers. A standalone clone without that sibling falls
