@@ -1,0 +1,43 @@
+{
+  "repository": ".",
+  "ref": "main",
+  "skills": ["*"],
+  "agents": {
+    "codex": {
+      "enabled": true,
+      "adapter": "filesystem",
+      "destination": "~/.codex/skills",
+      "mode": "copy"
+    },
+    "claude": {
+      "enabled": false,
+      "adapter": "filesystem",
+      "destination": "~/.claude/skills",
+      "mode": "copy"
+    },
+    "opencode": {
+      "enabled": false,
+      "adapter": "filesystem",
+      "destination": "~/.config/opencode/skills",
+      "mode": "copy"
+    },
+    "agents-compatible": {
+      "enabled": false,
+      "adapter": "filesystem",
+      "destination": "~/.agents/skills",
+      "mode": "copy"
+    },
+    "openwebui": {
+      "enabled": false,
+      "adapter": "archive",
+      "destination": ".build/openwebui",
+      "mode": "copy"
+    },
+    "chatgpt-desktop": {
+      "enabled": false,
+      "adapter": "archive",
+      "destination": ".build/chatgpt-desktop",
+      "mode": "copy"
+    }
+  }
+}

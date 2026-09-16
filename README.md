@@ -1,0 +1,46 @@
+# AI Skills
+
+A public, portable collection of reusable skills for coding agents and AI
+workspaces.
+
+## Design
+
+The `skills/` directory is the source of truth. Each skill is a directory with
+a `SKILL.md` entrypoint and optional supporting resources. Skills should be
+vendor-neutral; installation details belong to the sync tool and adapters.
+
+## Configure and sync
+
+```sh
+cp config/agents.example.json config/agents.local.json
+# Edit config/agents.local.json: enable only the agents you use.
+python3 scripts/validate.py
+python3 scripts/sync.py
+```
+
+The local config is ignored by Git. Filesystem agents can use `copy` for stable
+installations or `symlink` while developing. The sync tool refuses to overwrite
+an unmanaged skill directory.
+
+To synchronize a public release instead of the checkout, set `repository` to
+this repository's Git URL and set `ref` to an immutable tag such as `v0.1.0`.
+You can also use `python3 scripts/sync.py --ref v0.1.0`.
+
+Archive adapters write ZIP files under `.build/` for products whose skills are
+managed through an application workspace or upload flow. Review and upload
+those archives using that product's normal interface.
+
+## Release policy
+
+Use repository-wide semantic-version tags (`vMAJOR.MINOR.PATCH`). Every release
+must pass validation and receive a changelog entry. Consumers should pin a tag,
+not silently follow `main`; update intentionally when a new release is ready.
+
+## Contributing
+
+Skills are public. Do not include secrets, private filesystem paths, personal
+account details, or instructions that assume access to a private service.
+
+## License
+
+MIT. See [LICENSE](LICENSE).

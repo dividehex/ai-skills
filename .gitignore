@@ -1,0 +1,11 @@
+# Local agent selections and generated release/install output
+config/agents.local.json
+.build/
+.venv/
+__pycache__/
+*.py[cod]
+
+# OS/editor files
+.DS_Store
+.idea/
+.vscode/
