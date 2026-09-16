@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Install selected skills into configured agent locations."""
+"""Install selected skills and an optional private profile into agent locations."""
 
 from __future__ import annotations
 
@@ -87,10 +87,36 @@ def install_archive(skills: list[Path], destination: Path) -> None:
     )
 
 
+def install_profile(profile: Path, agent_name: str, agent: dict, root: Path) -> None:
+    """Install a profile file or create a product-specific upload archive."""
+    source = profile / "adapters" / f"{agent_name}.md"
+    if not source.is_file():
+        source = profile / "profile.md"
+    destination = Path(agent["profile_destination"])
+    if agent.get("profile_adapter", "filesystem") == "archive":
+        destination = destination if destination.is_absolute() else root / destination
+        destination.mkdir(parents=True, exist_ok=True)
+        archive = destination / f"profile-{agent_name}.zip"
+        with zipfile.ZipFile(archive, "w", zipfile.ZIP_DEFLATED) as output:
+            output.write(source, source.name)
+        print(f"{agent_name}: wrote private profile archive to {destination}")
+        return
+    destination = destination.expanduser()
+    marker = destination.with_name(destination.name + ".ai-profile-managed")
+    if destination.exists() and not marker.exists():
+        raise SystemExit(f"Refusing to overwrite unmanaged profile file: {destination}")
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    shutil.copy2(source, destination)
+    marker.write_text("Managed by ai-skills sync.py; do not edit the generated file.\n", encoding="utf-8")
+    print(f"{agent_name}: synchronized private profile to {destination}")
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--config", type=Path, help="Alternative JSON config file")
     parser.add_argument("--ref", help="Override the configured Git ref")
+    parser.add_argument("--profile-source", type=Path, help="Private profile checkout or Git repository")
+    parser.add_argument("--profile-ref", help="Git ref for a remote private profile")
     args = parser.parse_args()
     root = Path(__file__).resolve().parents[1]
     config = load_config(root)
@@ -99,6 +125,12 @@ def main() -> int:
     tree, temporary = source_tree(root, config, args.ref)
     try:
         skills = selected_skills(tree, config.get("skills", ["*"]))
+        profile = args.profile_source
+        profile_temp = None
+        if profile and not profile.is_dir():
+            profile_temp = tempfile.TemporaryDirectory(prefix="ai-profile-")
+            subprocess.run(["git", "clone", "--depth", "1", "--branch", args.profile_ref or "main", str(profile), profile_temp.name], check=True)
+            profile = Path(profile_temp.name)
         for name, agent in config.get("agents", {}).items():
             if not agent.get("enabled", False):
                 continue
@@ -109,6 +141,10 @@ def main() -> int:
             else:
                 install_filesystem(skills, destination, agent.get("mode", "copy"))
                 print(f"{name}: synchronized {len(skills)} skill(s) to {destination}")
+            if profile and agent.get("profile_destination"):
+                install_profile(profile, name, agent, root)
+        if profile_temp:
+            profile_temp.cleanup()
     finally:
         if temporary:
             temporary.cleanup()

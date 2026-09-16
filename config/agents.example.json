@@ -7,37 +7,45 @@
       "enabled": true,
       "adapter": "filesystem",
       "destination": "~/.codex/skills",
-      "mode": "copy"
+      "mode": "copy",
+      "profile_destination": "~/.codex/AGENTS.md"
     },
     "claude": {
       "enabled": false,
       "adapter": "filesystem",
       "destination": "~/.claude/skills",
-      "mode": "copy"
+      "mode": "copy",
+      "profile_destination": "~/.claude/CLAUDE.md"
     },
     "opencode": {
       "enabled": false,
       "adapter": "filesystem",
       "destination": "~/.config/opencode/skills",
-      "mode": "copy"
+      "mode": "copy",
+      "profile_destination": "~/.config/opencode/AGENTS.md"
     },
     "agents-compatible": {
       "enabled": false,
       "adapter": "filesystem",
       "destination": "~/.agents/skills",
-      "mode": "copy"
+      "mode": "copy",
+      "profile_destination": "~/.agents/AGENTS.md"
     },
     "openwebui": {
       "enabled": false,
       "adapter": "archive",
       "destination": ".build/openwebui",
-      "mode": "copy"
+      "mode": "copy",
+      "profile_adapter": "archive",
+      "profile_destination": ".build/openwebui"
     },
     "chatgpt-desktop": {
       "enabled": false,
       "adapter": "archive",
       "destination": ".build/chatgpt-desktop",
-      "mode": "copy"
+      "mode": "copy",
+      "profile_adapter": "archive",
+      "profile_destination": ".build/chatgpt-desktop"
     }
   }
 }

@@ -18,6 +18,15 @@ python3 scripts/validate.py
 python3 scripts/sync.py
 ```
 
+To add a separate private profile repository, pass it explicitly:
+
+```sh
+python3 scripts/sync.py --profile-source /path/to/ai-profile
+```
+
+The public repository never needs to contain personal information. Profile
+files are installed only for enabled agents that define `profile_destination`.
+
 The local config is ignored by Git. Filesystem agents can use `copy` for stable
 installations or `symlink` while developing. The sync tool refuses to overwrite
 an unmanaged skill directory.
