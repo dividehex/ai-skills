@@ -18,7 +18,12 @@ python3 scripts/validate.py
 python3 scripts/sync.py
 ```
 
-To add a separate private profile repository, pass it explicitly:
+When this repository is checked out beside the private profile repository at
+`../ai-profile`, the sync tool automatically uses that profile's configuration
+and synchronizes both layers. A standalone clone without that sibling falls
+back to the public example configuration.
+
+To use a private profile checkout elsewhere, pass it explicitly:
 
 ```sh
 python3 scripts/sync.py --profile-source /path/to/ai-profile

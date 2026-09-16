@@ -119,13 +119,15 @@ def main() -> int:
     parser.add_argument("--profile-ref", help="Git ref for a remote private profile")
     args = parser.parse_args()
     root = Path(__file__).resolve().parents[1]
-    config = load_config(root)
     if args.config:
         config = json.loads(args.config.read_text(encoding="utf-8"))
+    else:
+        profile_config = root.parent / "ai-profile" / "config" / "sync.json"
+        config = json.loads(profile_config.read_text(encoding="utf-8")) if profile_config.is_file() else load_config(root)
     tree, temporary = source_tree(root, config, args.ref)
     try:
         skills = selected_skills(tree, config.get("skills", ["*"]))
-        profile = args.profile_source
+        profile = args.profile_source or (root.parent / "ai-profile" if (root.parent / "ai-profile").is_dir() else None)
         profile_temp = None
         if profile and not profile.is_dir():
             profile_temp = tempfile.TemporaryDirectory(prefix="ai-profile-")
