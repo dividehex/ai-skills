@@ -133,20 +133,29 @@ def main() -> int:
             profile_temp = tempfile.TemporaryDirectory(prefix="ai-profile-")
             subprocess.run(["git", "clone", "--depth", "1", "--branch", args.profile_ref or "main", str(profile), profile_temp.name], check=True)
             profile = Path(profile_temp.name)
+        errors = []
         for name, agent in config.get("agents", {}).items():
             if not agent.get("enabled", False):
                 continue
-            destination = Path(agent["destination"]).expanduser()
-            if agent.get("adapter", "filesystem") == "archive":
-                install_archive(skills, root / destination if not destination.is_absolute() else destination)
-                print(f"{name}: wrote upload archives to {destination}")
-            else:
-                install_filesystem(skills, destination, agent.get("mode", "copy"))
-                print(f"{name}: synchronized {len(skills)} skill(s) to {destination}")
-            if profile and agent.get("profile_destination"):
-                install_profile(profile, name, agent, root)
+            try:
+                destination = Path(agent["destination"]).expanduser()
+                if agent.get("adapter", "filesystem") == "archive":
+                    install_archive(skills, root / destination if not destination.is_absolute() else destination)
+                    print(f"{name}: wrote upload archives to {destination}")
+                else:
+                    install_filesystem(skills, destination, agent.get("mode", "copy"))
+                    print(f"{name}: synchronized {len(skills)} skill(s) to {destination}")
+                if profile and agent.get("profile_destination"):
+                    install_profile(profile, name, agent, root)
+            except (OSError, SystemExit) as error:
+                errors.append(f"{name}: {error}")
+                print(f"{name}: skipped after error: {error}", file=sys.stderr)
         if profile_temp:
             profile_temp.cleanup()
+        if errors:
+            print("\nSync completed with errors:", file=sys.stderr)
+            print("\n".join(f"- {error}" for error in errors), file=sys.stderr)
+            return 1
     finally:
         if temporary:
             temporary.cleanup()
